@@ -11,7 +11,7 @@ def get_scores(inp, status):
     nhl_scores_url = "https://statsapi.web.nhl.com/api/v1/schedule?startDate=%s&endDate=%s&expand=schedule.linescore,schedule.teams"
     j = get_nhl_json(inp, nhl_scores_url)
     scores = []
-    games =  j['dates'][0]['games']
+    games = j['dates'][0]['games']
     for game in games:
         if game['status']['abstractGameState'] == status:
             scores.append(game)
@@ -40,11 +40,11 @@ def nhl_schedule(inp):
         teams = "%s @ %s" % (game['teams']['away']['team']['teamName'],
                              game['teams']['home']['team']['teamName'])
         broadcasts = []
-        for stations in game['broadcasts'] :
+        for stations in game['broadcasts']:
             broadcasts.append(stations['name'])
         schedule.append("%s%s ET (%s)" % (teams.ljust(25),
-                                        game_date.rjust(8),
-                                        ', '.join(broadcasts)))
+                                          game_date.rjust(8),
+                                          ', '.join(broadcasts)))
     return schedule
 
 @hook.command('scores', autohelp=False)
@@ -74,13 +74,13 @@ def nhl_finals(inp):
         home = game['teams']['home']['score']
         if away > home:
             winner = (game['teams']['away']['team']['teamName'], away)
-            loser =  (game['teams']['home']['team']['teamName'], home)
+            loser = (game['teams']['home']['team']['teamName'], home)
         else:
-            winner = (game['teams']['home']['team']['teamName'], home)
-            loser =  (game['teams']['away']['team']['teamName'], away)
-        scores.append("\x02%s: %s\x02, %s: %s" %
-                      (winner[0].ljust(12), winner[1],
-                       loser[0].ljust(12), loser[1]))
+            winner = ("%s:" % game['teams']['home']['team']['teamName'], home)
+            loser = ("%s:" %game['teams']['away']['team']['teamName'], away)
+        scores.append("\x02%s%s\x02, %s%s" %
+                      (winner[0].ljust(13), winner[1],
+                       loser[0].ljust(13), loser[1]))
     return scores
 
 @hook.command('pstat')
