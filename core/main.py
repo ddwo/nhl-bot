@@ -84,7 +84,6 @@ def run(func, input):
             input.say(input.nick + ': ')
             for line in out:
                 input.say(unicode(line))
-                #input.reply(unicode(line))
         else:
             input.reply(unicode(out))
 
