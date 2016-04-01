@@ -80,7 +80,11 @@ def run(func, input):
     else:
         out = func(input.inp)
     if out is not None:
-        input.reply(unicode(out))
+        if hasattr(out, "__iter__"):
+            for line in out:
+                input.reply(unicode(line))
+        else:
+            input.reply(unicode(out))
 
 
 def do_sieve(sieve, bot, input, func, type, args):
