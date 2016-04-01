@@ -81,8 +81,10 @@ def run(func, input):
         out = func(input.inp)
     if out is not None:
         if hasattr(out, "__iter__"):
+            input.say(input.nick + ': ')
             for line in out:
-                input.reply(unicode(line))
+                input.say(unicode(line))
+                #input.reply(unicode(line))
         else:
             input.reply(unicode(out))
 
