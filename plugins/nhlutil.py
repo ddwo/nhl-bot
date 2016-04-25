@@ -34,12 +34,15 @@ NHL_TEAMS = [
     (29, ('cbj', 'cjb', 'lumbus', 'columbus', 'blue jackets', 'bjs')),
     (30, ('min', 'minnesota', 'wild')),
     (52, ('wpg', 'winnipeg', 'jets')),
-    (53, ('ari', 'arizona', 'coyotes', 'yotes'))
+    (53, ('ari', 'arizona', 'coyotes', 'yotes', 'aroos'))
 ]
+
+
 
 def get_scores(inp, status):
     """Return NHL games with a specific status"""
-    j = get_nhl_json(get_date('today'))
+    date = get_date(inp)
+    j = get_nhl_json(date)
     scores = []
     games = j['dates'][0]['games']
     for game in games:
@@ -59,5 +62,4 @@ def get_nhl_json(start_date, end_date=None, team_id=None):
         end_date = start_date
     if team_id:
         return http.get_json(nhl_schedule_url % (start_date, end_date) + "&teamId=%s" % team_id)
-    else:
-        return http.get_json(nhl_schedule_url % (start_date, end_date))
+    return http.get_json(nhl_schedule_url % (start_date, end_date))

@@ -34,12 +34,24 @@ def nhl_schedule(inp):
             teams = "%s @ %s" % (game['teams']['away']['team']['teamName'],
                                  game['teams']['home']['team']['teamName'])
             broadcasts = []
-            for stations in game['broadcasts']:
-                broadcasts.append(stations['name'])
-            game_date = parse(game['gameDate']).astimezone(EASTERN).strftime('%-I:%M %p')
-            schedule.append("%s%s ET (%s)" % (teams.ljust(25),
-                                              game_date.rjust(8),
-                                              ', '.join(broadcasts)))
+            if game.get('broadcasts'):
+                for stations in game['broadcasts']:
+                    broadcasts.append(stations['name'])
+                    game_date = parse(game['gameDate']).astimezone(EASTERN).strftime('%A %b %-d @ %-I:%M %p') + ' ET'
+
+                schedule.append("%s%s (%s)" % (teams.ljust(25),
+                                               game_date.ljust(27),
+                                               ', '.join(broadcasts)))
+            else:
+                if game.get('gameDate'):
+                    game_date = parse(game['gameDate']).astimezone(EASTERN).strftime('%A %b %-d @') + ' TBA'
+                    schedule.append("%s%s (%s)" % (teams.ljust(25),
+                                                   game_date.ljust(27),
+                                                   "TBA"))
+                else:
+                    schedule.append("%s%s (%s)" % (teams.ljust(25),
+                                                   "TBA".ljust(27),
+                                                   "TBA"))
         return schedule
     else:
         # We want the schedule of today or some other day
@@ -78,6 +90,8 @@ def nhl_scores(inp):
 @hook.command('finals', autohelp=False)
 def nhl_finals(inp):
     """Return final games for the current or specified day"""
+    if inp is None:
+        inp = 'today'
     games = get_scores(inp, 'Final')
     scores = []
     for game in games:
@@ -94,14 +108,40 @@ def nhl_finals(inp):
                        loser[0].ljust(13), loser[1]))
     return scores
 
+@hook.command('shots', autohelp=False)
+@hook.command('sog', autohelp=False)
+def nhl_game_shots(inp):
+    """Return the shots for a specific team's game on today's date"""
+    j = None
+    if not inp:
+        return "Need a team name!"
+    inp = inp.lower()
+    for team in NHL_TEAMS:
+        for teamname in team[1]:
+            if inp == teamname:
+                j = get_nhl_json(get_date('today'),
+                                 team_id=team[0])
+    if j is not None:
+        game = j['dates'][0]['games'][0]
+        return "%s: %s; %s: %s" % (game['teams']['away']['team']['abbreviation'],
+                                   game['linescore']['teams']['away']['shotsOnGoal'],
+                                   game['teams']['home']['team']['abbreviation'],
+                                   game['linescore']['teams']['home']['shotsOnGoal'])
+    else:
+        # no json found for team
+        return "No game found, team not playing?"
+
 @hook.command('pstat')
 def nhl_skater_stats(inp):
+    # TODO implement
     return
 
 @hook.command('gstat')
 def nhl_goalie_stats(inp):
+    # TODO implement
     return
 
 @hook.command('ptop')
 def nhl_ptop(inp):
+    # TODO implement
     return
